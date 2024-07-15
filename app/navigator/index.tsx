@@ -21,7 +21,7 @@ const MyTheme = {
 interface Props {}
 
 const Navigator:FC<Props> = (props) => {
-  const loggedIn = true
+  const loggedIn = false
     return ( <NavigationContainer theme={MyTheme}>
 {!loggedIn ?<AuthNavigator /> : <AppNavigator />}
   </NavigationContainer>

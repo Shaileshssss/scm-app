@@ -51,9 +51,11 @@ const SignUp: FC<Props> = (props) => {
         if (res?.message) {
             showMessage({ message: res.message, type: "success" })
             const signInRes = await runAxiosAsync<SignInRes>(client.post('/auth/sign-in', values)
-            )
+        )
         }
         setBusy(false)
+        console.log(res);
+        
     };
 
     const { email, name, password } = userInfo
@@ -76,8 +78,9 @@ const SignUp: FC<Props> = (props) => {
                         value={email}
                         onChangeText={handleChange("email")}
                     />
+                    
                     <FormInput placeholder='Password'
-                        secureTextEntry value={password}
+                         value={password}
                         onChangeText={handleChange("password")} />
 
                     <AppButton active={!busy} title='Sign Up' onPress={handleSubmit} />

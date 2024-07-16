@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import colors from '@utils/colors';
 import Navigator from '@app/navigator';
 import FlashMessage from 'react-native-flash-message';
+import { Provider } from 'react-redux';
+import store from '@store/index';
 
 
 const Stack = createNativeStackNavigator();
@@ -18,10 +20,12 @@ const MyTheme = {
 
 export default function App() {
   return (
+    <Provider store={store}>
     <SafeAreaView style={styles.container}>
       <Navigator />
       <FlashMessage position='top'/>
     </SafeAreaView>
+    </Provider>
   );
 }
 

@@ -6,6 +6,8 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import colors from '@utils/colors';
 import AuthNavigator from "./AuthNavigator";
 import AppNavigator from "./AppNavigator";
+import { useSelector } from "react-redux";
+import { getAuthState } from "@store/auth";
 
 
 
@@ -21,8 +23,10 @@ const MyTheme = {
 interface Props {}
 
 const Navigator:FC<Props> = (props) => {
-  const loggedIn = false
-    return ( <NavigationContainer theme={MyTheme}>
+  const authState = useSelector(getAuthState)
+  console.log(authState);
+  
+  const loggedIn = authState.profile ? true : false;    return ( <NavigationContainer theme={MyTheme}>
 {!loggedIn ?<AuthNavigator /> : <AppNavigator />}
   </NavigationContainer>
     )

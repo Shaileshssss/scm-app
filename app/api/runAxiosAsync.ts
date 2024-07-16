@@ -25,7 +25,7 @@ export const runAxiosAsync = async <T>(promise: Promise<AxiosResponse<T>>):
             }
         }
 
-        showMessage({message, type:'danger'   })
+        showMessage({message, type:'danger'})
     }
     return null;
 }

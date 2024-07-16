@@ -8,12 +8,14 @@ import FormInput from '@app/ui/Forminput'
 import FromNavigator from '@app/ui/FormNavigator'
 import WelcomeHeader from '@app/ui/WelcomeHeader'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { updateAuthState } from '@store/auth'
 import colors from '@utils/colors'
 import { newUserSchema, signInSchema, yupValidate } from '@utils/validator'
 import axios from 'axios'
 import { FC, useState } from 'react'
 import { View, StyleSheet, ScrollView } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
+import { useDispatch } from 'react-redux'
 
 interface Props { }
 
@@ -39,6 +41,7 @@ const SignIn: FC<Props> = (props) => {
     password: ""
   })
   const [busy, setBusy] = useState(false)
+  const dispatch = useDispatch()
 
   const handleSubmit = async () => {
 
@@ -52,8 +55,8 @@ const SignIn: FC<Props> = (props) => {
 
     if (res){
       // Store the tokens
+      dispatch(updateAuthState({profile: res.profile, pending: false}))
       console.log(res);
-      
     }
     setBusy(false)
   };

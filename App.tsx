@@ -1,4 +1,4 @@
-import { Platform, SafeAreaView, StyleSheet, StatusBar } from 'react-native';
+import { Platform, SafeAreaView, StyleSheet, StatusBar, Modal } from 'react-native';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import colors from '@utils/colors';
@@ -21,6 +21,7 @@ const MyTheme = {
 export default function App() {
   return (
     <Provider store={store}>
+      {/* <Modal /> */}
     <SafeAreaView style={styles.container}>
       <Navigator />
       <FlashMessage position='top'/>

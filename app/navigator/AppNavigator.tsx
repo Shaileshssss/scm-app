@@ -6,11 +6,11 @@ import SignUp from "@views/SignUp";
 import { FC } from "react";
 import { StyleSheet } from "react-native";
 
-export type AuthStackParamList = {
+export type AppStackParamList = {
     Home: undefined;
 }
 
-const Stack = createNativeStackNavigator<AuthStackParamList>();
+const Stack = createNativeStackNavigator<AppStackParamList>();
 
 interface Props {}
 

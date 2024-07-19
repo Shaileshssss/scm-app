@@ -7,15 +7,13 @@ import FormDivider from '@app/ui/FormDivider'
 import FormInput from '@app/ui/Forminput'
 import FromNavigator from '@app/ui/FormNavigator'
 import WelcomeHeader from '@app/ui/WelcomeHeader'
+import useAuth from '@hooks/useAuth'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import colors from '@utils/colors'
 import { newUserSchema, yupValidate } from '@utils/validator'
-import axios from 'axios'
 import { FC, useState } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { showMessage } from 'react-native-flash-message'
-import * as yup from 'yup';
-import { SignInRes } from './SignIn'
 
 
 interface Props { }
@@ -27,7 +25,8 @@ const SignUp: FC<Props> = (props) => {
         password: ""
     })
     const [busy, setBusy] = useState(false)
-    const { navigate } = useNavigation<NavigationProp<AuthStackParamList>>()
+    const { navigate } = useNavigation<NavigationProp<AuthStackParamList>>();
+    const {signIn} = useAuth()
 
     const handleChange = (name: string) => (text: string) => {
         setUserInfo({ ...userInfo, [name]: text })
@@ -49,13 +48,11 @@ const SignUp: FC<Props> = (props) => {
         )
 
         if (res?.message) {
-            showMessage({ message: res.message, type: "success" })
-            const signInRes = await runAxiosAsync<SignInRes>(client.post('/auth/sign-in', values)
-        )
+            showMessage({ message: res.message, type: "success" });
+            signIn(values!)
         }
         setBusy(false)
         console.log(res);
-        
     };
 
     const { email, name, password } = userInfo

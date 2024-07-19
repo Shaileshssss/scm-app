@@ -1,3 +1,5 @@
+import client from '@app/api/client'
+import { runAxiosAsync } from '@app/api/runAxiosAsync'
 import { AuthStackParamList } from '@app/navigator/AuthNavigator'
 import AppButton from '@app/ui/AppButton'
 import CustomKeyAvoidingView from '@app/ui/CustomKeyView'
@@ -7,13 +9,29 @@ import FromNavigator from '@app/ui/FormNavigator'
 import WelcomeHeader from '@app/ui/WelcomeHeader'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import colors from '@utils/colors'
-import { FC } from 'react'
+import { emailRegex } from '@utils/validator'
+import { FC, useState } from 'react'
 import { View, StyleSheet, Button, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { showMessage } from 'react-native-flash-message'
 
 interface Props { }
 
 const ForgetPassword: FC<Props> = (props) => {
-    const { navigate } = useNavigation<NavigationProp<AuthStackParamList>>()
+    const [email, setEmail] = useState("")
+    const [busy, setBusy] = useState(false);
+    const { navigate } = useNavigation<NavigationProp<AuthStackParamList>>();
+
+    const handleSubmit = async () => {
+        if (!emailRegex.test(email)) {
+            return showMessage({ message: "Invalid email Id!", type: 'danger' })
+        }
+        setBusy(true)
+        const res = await runAxiosAsync<{ message: string }>(client.post('/auth/forget-pass', { email }))
+        setBusy(false)
+        if (res) {
+            showMessage({ message: res.message, type: 'success' })
+        }
+    }
     return (
         // <KeyboardAvoidingView
         //     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -49,9 +67,15 @@ const ForgetPassword: FC<Props> = (props) => {
                     placeholder='Email'
                     keyboardType='email-address'
                     autoCapitalize='none'
+                    value={email}
+                    onChangeText={text => setEmail(text)}
                 />
 
-                <AppButton title='Request Link' />
+                <AppButton 
+                active={!busy}
+                 title={busy ? "Please wait" : "Request Link"}
+                  onPress={handleSubmit}
+                />
                 <FormDivider />
 
                 <FromNavigator onLeftPress={() => navigate("SignUp")}

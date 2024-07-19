@@ -1,9 +1,8 @@
 import axios from "axios"
 
-const baseURL = 'http://localhost:8081'
+export const baseURL = 'http://localhost:8081/'
 
 const client = axios.create({baseURL})
 
 export default client
-
 

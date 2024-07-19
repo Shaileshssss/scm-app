@@ -7,6 +7,8 @@ import FormDivider from '@app/ui/FormDivider'
 import FormInput from '@app/ui/Forminput'
 import FromNavigator from '@app/ui/FormNavigator'
 import WelcomeHeader from '@app/ui/WelcomeHeader'
+import useAuth from '@hooks/useAuth'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { updateAuthState } from '@store/auth'
 import colors from '@utils/colors'
@@ -19,20 +21,6 @@ import { useDispatch } from 'react-redux'
 
 interface Props { }
 
-export interface SignInRes {
-  profile: {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    verified:boolean;
-
-  };
-  tokens: {
-    refresh: string;
-    access: string;
-  }
-}
 
 const SignIn: FC<Props> = (props) => {
   const { navigate } = useNavigation<NavigationProp<AuthStackParamList>>();
@@ -40,25 +28,16 @@ const SignIn: FC<Props> = (props) => {
     email: "",
     password: ""
   })
-  const [busy, setBusy] = useState(false)
-  const dispatch = useDispatch()
+  const {signIn} = useAuth()
+
 
   const handleSubmit = async () => {
 
     const { values, error } = await yupValidate(signInSchema, userInfo);
 
-    if (error) return showMessage({ message: error, type: 'danger' })
-    setBusy(true)
-    const res = await runAxiosAsync<SignInRes>(
-      client.post("/auth/sign-in", values)
-    )
-
-    if (res){
-      // Store the tokens
-      dispatch(updateAuthState({profile: res.profile, pending: false}))
-      console.log(res);
-    }
-    setBusy(false)
+    if (error) return showMessage({ message: error, type: 'danger' });
+    if (values)  signIn(values)
+      
   };
 
   const handleChange = (name: string) => (text: string) => {
@@ -80,7 +59,7 @@ const SignIn: FC<Props> = (props) => {
             secureTextEntry
             value={password} onChangeText={handleChange("password")} />
 
-          <AppButton active={!busy} title='Sign In' onPress={handleSubmit}/>
+          <AppButton title='Sign In' onPress={handleSubmit} />
 
           <FormDivider />
 

@@ -1,23 +1,23 @@
 import * as yup from 'yup'
 
-type ValidationResult<T>= {error?: string; values?:T}
+type ValidationResult<T> = { error?: string; values?: T }
 
 export const yupValidate = async <T extends object>
-(schema: yup.Schema, value: T):
-Promise<ValidationResult<T>> => {
+    (schema: yup.Schema, value: T):
+    Promise<ValidationResult<T>> => {
     try {
-       const data = await schema.validate(value);
-       return {values: data}
+        const data = await schema.validate(value);
+        return { values: data }
     } catch (error) {
-        if(error instanceof yup.ValidationError) {
-            return {error: error.message}
-        }else{
-           return {error: (error as any).message };
+        if (error instanceof yup.ValidationError) {
+            return { error: error.message }
+        } else {
+            return { error: (error as any).message };
         }
     }
 }
 
-const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex =
     /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#\$%\^&\*])[a-zA-Z\d!@#\$%\^&\*]+$/;
 
@@ -31,20 +31,33 @@ yup.addMethod(yup.string, 'email', function validateEmail(message) {
 
 const nameAndEmailValidation = {
     email: yup.string().email("Invalid email!")
-    .required("Email is missing"),
+        .required("Email is missing"),
     password: yup.string()
-    .required("Password is missing")
-    .min(8, "Password should be at least 8 characters")
-    .matches(passwordRegex, "Password is too short")
+        .required("Password is missing")
+        .min(8, "Password should be at least 8 characters")
+        .matches(passwordRegex, "Password is too short")
 }
 
 export const newUserSchema = yup.object({
     name: yup.string().required("Name is Missing"),
-...nameAndEmailValidation
+    ...nameAndEmailValidation
 
 });
 
 export const signInSchema = yup.object({
-...nameAndEmailValidation
+    ...nameAndEmailValidation
 
 });
+
+export const newProductSchema = yup.object({
+    name: yup.string().required("Product Name is Missing!"),
+    description: yup.string().required("Product description is missing!"),
+    category: yup.string().required("Product category is missing!"),
+    price: yup.string().transform((value) => {
+        if (isNaN(+value)) return "";
+
+        return value;
+    })
+        .required("Product price is missing!"),
+    purchasingDate: yup.date().required("Purchasing  date is missing!")
+})

@@ -4,6 +4,8 @@ import SignIn from "@views/SignIn";
 import SignUp from "@views/SignUp";
 import { FC } from "react";
 import { StyleSheet } from "react-native";
+import ProfileNavigator from "./ProfileNavigator";
+import ProductDetail from "@components/ProductDetail";
 
 export type AuthStackParamList = {
   SignIn: undefined;

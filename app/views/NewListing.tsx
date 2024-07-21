@@ -19,6 +19,9 @@ import useClient from "@hooks/useClient";
 import auth from "@store/auth";
 import { runAxiosAsync } from "@app/api/runAxiosAsync";
 import LoadingSpinner from "@app/ui/LoadingSpinner";
+import OptionSelector from "./OptionSelector";
+import { selectImages } from "@utils/helpers";
+import CategoryOptions from "@components/CategoryOptions";
 
 interface Props { }
 
@@ -27,7 +30,7 @@ const defaultInfo = {
     description: "",
     category: "",
     price: '',
-    purchasingDate: new Date()
+    purchasingDate: new Date(),
 }
 
 const imageOption = [{ value: "Remove Image", id: 'remove' }]
@@ -40,7 +43,7 @@ const NewListing: FC<Props> = (props) => {
     const [images, setImages] = useState<string[]>([]);
     const [selectedImage, setSelectedImage] = useState('')
     const {authClient} = useClient()
-    const { category, description, name, price, purchasingDate } = productInfo
+    const { category, description, name, price, purchasingDate } = productInfo;
 
     const handleChange = (name: string) => (text: string) => {
         setProductInfo({ ...productInfo, [name]: text })
@@ -98,20 +101,15 @@ console.log(res);
 
     };
 
+    // const handleOnImageSelection = async () => {
+    //     const newImages = await selectImages()
+    //     setImages([...images, ...newImages])
+    // };
+
     const handleOnImageSelection = async () => {
-        try {
-            const { assets } = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: false,
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                quality: 0.3,
-                allowsMultipleSelection: true,
-            })
-            if (!assets) return
-            // console.log(assets);
-            const imageUris = assets.map(({ uri }) => uri)
-            setImages([...images, ...imageUris])
-        } catch (error) {
-            showMessage({ message: (error as any).message, type: 'danger' });
+        const newImages = await selectImages();
+        if (newImages) {
+            setImages([...images,...newImages]);
         }
     };
 
@@ -162,12 +160,17 @@ console.log(res);
                         setProductInfo({ ...productInfo, purchasingDate })
                     }
                 />
-                <Pressable style={styles.categorySelector}
-                    onPress={() => setShowCategoryModal(true)}
-                >
-                    <Text style={styles.categoryTitle}>{category || "Category"}</Text>
-                    <AntDesign name="caretdown" color={colors.primary} />
-                </Pressable>
+
+                <CategoryOptions 
+                onSelect={handleChange("category")}
+                 title={category || "Category"}
+                 />
+{/*                
+                <OptionSelector 
+                title={category || "Category"}
+                onPress={() => setShowCategoryModal(true)}
+                /> */}
+
                 <FormInput
                     placeholder="Description"
                     multiline

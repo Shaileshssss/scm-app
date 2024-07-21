@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Product } from "@store/listings";
 import Chats from "@views/Chats";
 import ChatWindow from "@views/ChatWindow";
+import EditProduct from "@views/EditProduct";
 import ForgetPassword from "@views/ForgetPassword";
 import Home from "@views/Home";
 import Listings from "@views/Listings";
@@ -18,6 +19,7 @@ export type ProfileNavigatorParamList = {
   Listings: undefined;
   SingleProduct: {product?:  Product};
   ChatWindow: undefined;
+  EditProduct : { product: Product};
 }
 
 const Stack = createNativeStackNavigator<ProfileNavigatorParamList>();
@@ -32,6 +34,8 @@ const ProfileNavigator: FC<Props> = (props) => {
     <Stack.Screen name="Listings" component={Listings} />
     <Stack.Screen name="SingleProduct" component={SingleProduct} />
     <Stack.Screen name="ChatWindow" component={ChatWindow} />
+    <Stack.Screen name="EditProduct" component={EditProduct} />
+
 
   </Stack.Navigator>
     )

@@ -1,14 +1,17 @@
 import { runAxiosAsync } from "@app/api/runAxiosAsync";
 import { AppStackParamList } from "@app/navigator/AppNavigator";
+import socket, { handleSocketConnection } from "@app/socket";
 import ChatNotification from "@app/ui/ChatNotification";
 import CategoryList from "@components/CategoryList";
 import LatestProductList, { LatestProduct } from "@components/LatestProductList";
 import SearchBar from "@components/SearchBar";
+import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import size from "@utils/size";
 import { FC, useEffect, useState } from "react";
 import { Text, View, StyleSheet, ScrollView } from "react-native";
+import { useDispatch } from "react-redux";
 
 
 
@@ -62,6 +65,8 @@ const Home: FC<Props> = (props) => {
   const [products, setProducts] = useState<LatestProduct[]>([])
     const {navigate} = useNavigation<NavigationProp<AppStackParamList>>()
     const {authClient} = useClient()
+    const {authState} = useAuth()
+    const dispatch = useDispatch();
 
     const fetchLatestProduct = async () => {
     const res =  await runAxiosAsync<{products: LatestProduct[]}>(authClient.get('/product/latest'))
@@ -73,13 +78,47 @@ const Home: FC<Props> = (props) => {
     useEffect(() => {
       fetchLatestProduct()
     }, [])
+
+    // useEffect(() => {
+    //   socket.auth = {token: authState.profile?.accessToken}
+    //   socket.connect()
+
+    //   socket.on('connect', () => {
+    //     console.log("connected",socket.connected);
+        
+    //   })
+
+    //   socket.on("disconnect", () => {
+    //     console.log("disconnected", socket.connected);
+    //   })
+
+    //   socket.on('connect_error', (error) => {
+    //     console.log("Error in socket:", error.message);
+        
+    //   })
+    //   return () => {
+    //     socket.disconnect()
+    //   }
+    // }, []);
+
+    useEffect(() => {
+      if(authState.profile)
+      handleSocketConnection(authState.profile, dispatch)
+      return() => {
+        socket.disconnect();
+      }
+    }, []);
+
+
     return (
         <>
         <ChatNotification onPress={() => navigate('Chats') } />
         <ScrollView style={styles.container}>
             <SearchBar />
-            <CategoryList onPress={() => navigate("ProductList")}/>
-                <LatestProductList data={products}/>
+            <CategoryList onPress={(category) => navigate("ProductList", {category})}/>
+                <LatestProductList data={products} 
+                onPress={({id}) => navigate("SingleProduct", {id})}
+                />
         </ScrollView>
         </>
     )

@@ -9,12 +9,19 @@ import { getAuthState, updateAuthState } from "@store/auth";
 
 const authClient = axios.create({ baseURL });
 
-type Response = {
+export type TokenResponse = {
     tokens: {
         refresh: string;
         access: string;
-    }
-}
+    };
+    profile: {
+        id : string,
+        email : string,
+        name : string,
+        verified : boolean,
+        avatar : string,
+      },
+};
 
 const useClient = () => {
     // const { authState } = useAuth();
@@ -41,19 +48,19 @@ const useClient = () => {
             method: 'POST', data: { refreshToken },
             url: `${baseURL}/auth/refresh-token`
         }
-        const res = await runAxiosAsync<Response>(axios(options))
+        const res = await runAxiosAsync<TokenResponse>(axios(options))
         if (res?.tokens) {
             failedRequest.response.config.headers.Authorization = "Bearer " + res.tokens.access;
             // to handle signout if the token is expired
             if (failedRequest.response.config.url === '/auth/sign-out') {
-                failedRequest.response.config.data = { refreshToken: res.tokens.refresh }
+                failedRequest.response.config.data = { refreshToken: res.tokens.refresh, }
             }
 
             await asyncStorage.save(Keys.AUTH_TOKEN, res.tokens.access)
             await asyncStorage.save(Keys.REFRESH_TOKEN, res.tokens.refresh)
             dispatch(updateAuthState({
-                profile: { ...authState.profile!, accessToken: res.tokens.access },
-                pending: false
+                profile: { ...res.profile, accessToken: res.tokens.access },
+                pending: false,
             })
             );
             return Promise.resolve;

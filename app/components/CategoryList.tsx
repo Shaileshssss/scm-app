@@ -13,6 +13,7 @@ const LIST_ITEM_SIZE = 80;
 
 const CategoryList: FC<Props> = ({onPress}) => {
     return (
+        
         <View style={styles.container}>
             <FlatList
                 horizontal

@@ -17,8 +17,11 @@ export type ProfileNavigatorParamList = {
   Profile: undefined;
   Chats: undefined;
   Listings: undefined;
-  SingleProduct: {product?:  Product};
-  ChatWindow: undefined;
+  SingleProduct: {product?:  Product, id?:string};
+  ChatWindow: {
+    conversationId: string;
+    peerProfile: { id: string; name: string; avatar?: string };
+  }
   EditProduct : { product: Product};
 }
 

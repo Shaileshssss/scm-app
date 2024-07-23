@@ -5,12 +5,43 @@ import asyncStorage, { Keys } from '@utils/asyncStorage';
 import client, { baseURL } from 'app/api/client'
 import { io } from 'socket.io-client'
 import {TokenResponse } from '../hooks/useClient'
+import { updateConversation } from '@store/conversation';
 
 const socket = io(baseURL, {path: '/socket-message', autoConnect:false})
+
+type MessageProfile = {
+    id: string,
+    name: string,
+    avatar?: string,
+};
+
+type NewMessageResponse = {
+message : {
+    id: string;
+    time: string;
+    text: string;
+    user: MessageProfile;
+};
+from: MessageProfile;
+conversationId: string;
+}
 
 export const handleSocketConnection = (profile: Profile, dispatch: Dispatch<UnknownAction>) => {
 socket.auth = {token: profile.accessToken}
 socket.connect()
+
+socket.on("chat:message",(data: NewMessageResponse) => {
+    const {conversationId, from, message} = data
+    dispatch(
+        updateConversation({
+            conversationId,
+            chat: message,
+            peerProfile: from,
+        })
+    )
+    // this will update on going conversation or messages in between two users
+    console.log(data)
+})
 
 socket.on("connect_error", async(error) => {
     if(error.message === 'jwt expired') {

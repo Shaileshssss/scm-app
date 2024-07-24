@@ -1,3 +1,4 @@
+import { runAxiosAsync } from "@app/api/runAxiosAsync";
 import { AppStackParamList } from "@app/navigator/AppNavigator";
 import socket from "@app/socket";
 import AvatarView from "@app/ui/AvatarView";
@@ -6,9 +7,10 @@ import EmptyChatContainer from "@app/ui/EmptyChatContainer";
 import PeerProfile from "@app/ui/PeerProfile";
 import AppHeader from "@components/AppHeader";
 import useAuth from "@hooks/useAuth";
+import useClient from "@hooks/useClient";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Conversation, selectConversationById, updateConversation } from "@store/conversation";
-import { FC } from "react";
+import { addConversation, Conversation, selectConversationById, updateConversation } from "@store/conversation";
+import { FC, useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,6 +63,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
     const { conversationId, peerProfile } = route.params;
     const chats = useSelector(selectConversationById(conversationId));
     const dispatch = useDispatch();
+    const {authClient} = useClient()
     const profile = authState.profile;
 
     const handleOnMessageSend = (messages: IMessage[]) => {
@@ -88,6 +91,19 @@ const ChatWindow: FC<Props> = ({ route }) => {
         // Sending message to our api
         socket.emit("chat:new", newMessage);
     };
+
+
+    const fetchOldChats = async() => {
+      const res =  await runAxiosAsync<{conversation: Conversation}>(authClient('/conversation/chats/' + conversationId))
+
+      if(res?.conversation) {
+        dispatch(addConversation([res.conversation]))
+      }
+    }
+
+    useEffect(() => {
+        fetchOldChats()
+    }, [])
 
     if (!profile) return null;
 

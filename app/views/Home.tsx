@@ -8,6 +8,7 @@ import SearchBar from "@components/SearchBar";
 import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { ActiveChat, addNewActiveChats } from "@store/chats";
 import size from "@utils/size";
 import { FC, useEffect, useState } from "react";
 import { Text, View, StyleSheet, ScrollView } from "react-native";
@@ -73,33 +74,22 @@ const Home: FC<Props> = (props) => {
     if(res?.products) {
       setProducts(res.products)
     }
-    }
+    };
+
+    const fetchLastChats = async () => {
+      const res = await runAxiosAsync<{
+          chats: ActiveChat[]
+      }>(authClient('/conversation/last-chats'));
+
+      if (res) {
+          dispatch(addNewActiveChats(res.chats))
+      }
+  }
 
     useEffect(() => {
-      fetchLatestProduct()
-    }, [])
-
-    // useEffect(() => {
-    //   socket.auth = {token: authState.profile?.accessToken}
-    //   socket.connect()
-
-    //   socket.on('connect', () => {
-    //     console.log("connected",socket.connected);
-        
-    //   })
-
-    //   socket.on("disconnect", () => {
-    //     console.log("disconnected", socket.connected);
-    //   })
-
-    //   socket.on('connect_error', (error) => {
-    //     console.log("Error in socket:", error.message);
-        
-    //   })
-    //   return () => {
-    //     socket.disconnect()
-    //   }
-    // }, []);
+      fetchLatestProduct();
+      fetchLastChats();
+    }, []);
 
     useEffect(() => {
       if(authState.profile)
